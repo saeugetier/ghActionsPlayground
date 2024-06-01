@@ -22,7 +22,7 @@ jobs:
         image: rpi-os-image.img
         machine: rpi-3b+
         user: pi
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y cowsay build-essential cmake qt5-default
-        /usr/games/cowsay "I am $USER!"
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cowsay build-essential cmake qt5-default
+          /usr/games/cowsay "I am $USER!"
