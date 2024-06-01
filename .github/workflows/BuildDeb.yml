@@ -16,6 +16,15 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Install and run cowsay
+      uses: ethanjli/pinspawn-action@v0.1.1
+      with:
+        image: rpi-os-image.img
+        run: |
+          apt-get update
+          apt-get install -y cowsay
+          /usr/games/cowsay 'I am running in a light-weight namespace container!'
+
     - name: Run as user pi in booted container
       uses: ethanjli/piqemu-action@v0.1.0
       with:
