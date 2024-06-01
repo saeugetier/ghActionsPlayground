@@ -9,29 +9,62 @@ on:
       - main
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  release-raspi:
+    name: Release (Raspberry Pi ${{ matrix.arch }})
+    runs-on: ubuntu-20.04
+
+    strategy:
+      matrix:
+        arch: [ armhf, arm64 ]
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout Source
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-    - name: Install and run cowsay
-      uses: ethanjli/pinspawn-action@v0.1.1
-      with:
-        image: rpi-os-image.img
-        run: |
-          apt-get update
-          apt-get install -y cowsay
-          /usr/games/cowsay 'I am running in a light-weight namespace container!'
+      - name: Update Packages
+        shell: bash
+        run: sudo apt-get -yq update
 
-    - name: Run as user pi in booted container
-      uses: ethanjli/piqemu-action@v0.1.0
-      with:
-        image: rpi-os-image.img
-        machine: rpi-3b+
-        user: pi
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y cowsay build-essential cmake qt5-default
-          /usr/games/cowsay "I am $USER!"
+      - name: Prepare Sysroot
+        id: pi-sysroot
+        uses: mariotaku/raspbian-sysroot-action@v1.3
+        with:
+          release: bullseye
+          packages: ${{github.workspace}}/scripts/raspi/sysroot-packages.list
+          arch: ${{ matrix.arch }}
+
+      - name: Install Build Tools
+        shell: bash
+        run: sudo apt-get -y -qq install crossbuild-essential-${{ matrix.arch }} cmake gettext
+
+      - name: Create Build Environment
+        run: cmake -E make_directory ${{github.workspace}}/build
+
+      - name: Configure CMake
+        shell: bash
+        working-directory: ${{github.workspace}}/build
+        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DTARGET_RASPI=ON
+          -DCMAKE_TOOLCHAIN_FILE=${{steps.pi-sysroot.outputs.cmake-toolchain}}
+
+      - name: Build
+        working-directory: ${{github.workspace}}/build
+        shell: bash
+        run: cmake --build . --config $BUILD_TYPE
+
+      - name: Package
+        working-directory: ${{github.workspace}}/build
+        run: cpack
+
+      - name: Create Release (Raspberry Pi)
+        id: create_release_raspi
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.event.release.tag_name }}
+          allowUpdates: true
+          omitNameDuringUpdate: true
+          omitBody: true
+          omitPrereleaseDuringUpdate: true
+          artifacts: build/*.deb
