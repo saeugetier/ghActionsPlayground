@@ -16,28 +16,13 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v2
+    - name: Run as user pi in booted container
+      uses: ethanjli/piqemu-action@v0.1.0
       with:
-        platforms: arm
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-
-    - name: Cache CMake
-      uses: actions/cache@v3
-      with:
-        path: ~/.cache
-        key: ${{ runner.os }}-cmake-${{ hashFiles('**/CMakeLists.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-cmake-
-
-    - name: Set up Raspberry Pi OS image
+        image: rpi-os-image.img
+        machine: rpi-3b+
+        user: pi
       run: |
-        docker pull balenalib/raspberrypi3-debian:latest
-        docker run --name rpi-build -itd balenalib/raspberrypi3-debian:latest
-
-    - name: Install dependencies
-      run: |
-        docker exec rpi-build apt-get update
-        docker exec rpi-build apt-get install -y build-essential cmake qt5-default
+        sudo apt-get update
+        sudo apt-get install -y cowsay build-essential cmake qt5-default
+        /usr/games/cowsay "I am $USER!"
