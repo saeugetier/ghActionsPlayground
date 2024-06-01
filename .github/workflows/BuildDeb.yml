@@ -34,8 +34,8 @@ jobs:
 
     - name: Set up Raspberry Pi OS image
       run: |
-        docker pull raspbian/bookworm:latest
-        docker run --name rpi-build -itd raspbian/bookworm:latest
+        docker pull raspbian/buster:latest
+        docker run --name rpi-build -itd raspbian/buster:latest
 
     - name: Install dependencies
       run: |
