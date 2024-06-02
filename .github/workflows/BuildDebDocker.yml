@@ -1,0 +1,43 @@
+name: Build Debian Package for Raspberry Pi
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+      with:
+        platforms: arm
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Cache CMake
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache
+        key: ${{ runner.os }}-cmake-${{ hashFiles('**/CMakeLists.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-cmake-
+
+    - name: Set up Raspberry Pi OS image
+      run: |
+        docker pull dtcooper/raspberrypi-os:bookworm
+        docker run --name rpi-build -itd dtcooper/raspberrypi-os:bookworm
+
+    - name: Install dependencies
+      run: |
+        docker exec rpi-build apt-get update
+        docker exec rpi-build apt-get install -y build-essential cmake qt5-default
