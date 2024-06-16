@@ -35,7 +35,7 @@ jobs:
     - name: Set up Raspberry Pi OS image
       run: |
         docker pull balenalib/raspberry-pi2-debian:buster-build
-        docker run --name rpi-build -itd balenalib/raspberry-pi2-debian:buster-build
+        docker run --name rpi-build -itd --memory=2g balenalib/raspberry-pi2-debian:buster-build
 
 
     - name: Test Environment
