@@ -41,7 +41,6 @@ jobs:
     - name: Test Environment
       run: |
         docker exec rpi-build echo "Hello World!"
-        docker exec rpi-build uname -a
         docker exec rpi-build apt-get changelog git
         
 
