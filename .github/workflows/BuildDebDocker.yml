@@ -41,6 +41,9 @@ jobs:
     - name: Test Environment
       run: |
         docker exec rpi-build echo "Hello World!"
+        docker exec rpi-build uname -a
+        docker exec rpi-build cat /etc/issue
+        
 
     - name: Install dependencies
       run: |
