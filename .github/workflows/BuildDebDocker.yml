@@ -34,8 +34,8 @@ jobs:
 
     - name: Set up Raspberry Pi OS image
       run: |
-        docker pull balenalib/raspberrypi3-64-debian:buster-build
-        docker run --name rpi-build -itd balenalib/raspberrypi3-64-debian:buster-build
+        docker pull balenalib/raspberrypi2-32-debian:buster-build
+        docker run --name rpi-build -itd balenalib/raspberrypi2-32-debian:buster-build
 
     - name: Install dependencies
       run: |
