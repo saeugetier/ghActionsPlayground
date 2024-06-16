@@ -42,7 +42,7 @@ jobs:
       run: |
         docker exec rpi-build echo "Hello World!"
         docker exec rpi-build uname -a
-        docker exec rpi-build cat /etc/issue
+        docker exec rpi-build apt-get changelog git
         
 
     - name: Install dependencies
