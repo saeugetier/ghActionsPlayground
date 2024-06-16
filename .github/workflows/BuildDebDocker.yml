@@ -37,7 +37,12 @@ jobs:
         docker pull balenalib/raspberry-pi2-debian:buster-build
         docker run --name rpi-build -itd balenalib/raspberry-pi2-debian:buster-build
 
+
+    - name: Test Environment
+      run: |
+        docker exec rpi-build echo "Hello World!"
+
     - name: Install dependencies
       run: |
         docker exec rpi-build apt-get update
-        docker exec rpi-build apt-get install -y build-essential cmake qt5-default
+        docker exec rpi-build apt-get install -y build-essential
